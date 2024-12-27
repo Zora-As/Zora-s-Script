@@ -1,0 +1,326 @@
+-- Load the Orion Library
+local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
+
+-- Create the Window
+local Window = OrionLib:MakeWindow({Name = "Zora's Script Hub", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
+
+-- Create the Player Tab (formerly Tab 1)
+local PlayerTab = Window:MakeTab({
+	Name = "Player",  -- Renamed Tab
+	Icon = "rbxassetid://4483345998", -- Replace with your icon ID if needed
+	PremiumOnly = false
+})
+
+-- Freeze Toggle (for Player Tab)
+local isFrozen = false
+local function ToggleFreeze()
+    local character = game.Players.LocalPlayer.Character
+    if character then
+        local humanoidRootPart = character:WaitForChild("HumanoidRootPart") -- Grab the root part
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        
+        if humanoid then
+            if isFrozen then
+                -- Freeze position but allow body movement
+                humanoidRootPart.Anchored = true  -- Anchor the root part to freeze position
+                humanoid.PlatformStand = true  -- Disable walking but allow moving limbs (arms, etc.)
+            else
+                -- Unfreeze and allow normal movement
+                humanoidRootPart.Anchored = false  -- Unfreeze the root part
+                humanoid.PlatformStand = false  -- Allow normal movement (walking, etc.)
+            end
+        end
+    end
+end
+
+-- Walk Speed (for Player Tab)
+local defaultWalkSpeed = 16
+local function SetWalkSpeed(speed)
+    local character = game.Players.LocalPlayer.Character
+    if character then
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid.WalkSpeed = speed
+        end
+    end
+end
+
+-- Jump Power (for Player Tab)
+local defaultJumpPower = 50
+local function SetJumpPower(power)
+    local character = game.Players.LocalPlayer.Character
+    if character then
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid.JumpPower = power
+        end
+    end
+end
+
+-- Teleport to Coordinates (for Player Tab)
+local function TeleportToCoordinates(x, y, z)
+    local character = game.Players.LocalPlayer.Character
+    if character then
+        local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+        humanoidRootPart.CFrame = CFrame.new(x, y, z)
+    end
+end
+
+-- Instant Respawn Toggle (for Player Tab)
+local function InstantRespawn()
+    game.Players.LocalPlayer.CharacterAdded:Connect(function(character)
+        character:WaitForChild("Humanoid").Died:Connect(function()
+            wait(0.1) -- Wait for the character to fully die
+            game.Players.LocalPlayer:LoadCharacter() -- Respawn the character immediately
+        end)
+    end)
+end
+
+-- Fling Feature (for Player Tab)
+local function FlingCharacter()
+    local character = game.Players.LocalPlayer.Character
+    if character then
+        local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+        if humanoidRootPart then
+            local bodyVelocity = Instance.new("BodyVelocity")
+            bodyVelocity.MaxForce = Vector3.new(100000, 100000, 100000)
+            bodyVelocity.Velocity = Vector3.new(500, 500, 500)  -- Set your fling speed here
+            bodyVelocity.Parent = humanoidRootPart
+            game:GetService("Debris"):AddItem(bodyVelocity, 0.1)  -- Clean up the fling after a short time
+        end
+    end
+end
+
+-- Add Freeze Toggle for Player Tab
+PlayerTab:AddToggle({
+    Name = "Freeze Character",
+    Default = false,
+    Callback = function(Value)
+        isFrozen = Value
+        ToggleFreeze()
+    end    
+})
+
+-- Add Walk Speed Slider for Player Tab
+PlayerTab:AddSlider({
+    Name = "Walk Speed",
+    Min = 0,
+    Max = 200,
+    Default = defaultWalkSpeed,
+    Color = Color3.fromRGB(255, 255, 255),
+    Increment = 1,
+    ValueName = "Speed",
+    Callback = function(Value)
+        SetWalkSpeed(Value)
+    end    
+})
+
+-- Add Reset Button for Walk Speed in Player Tab
+PlayerTab:AddButton({
+    Name = "Reset Walk Speed",
+    Callback = function()
+        SetWalkSpeed(defaultWalkSpeed)
+    end    
+})
+
+-- Add Jump Power Slider for Player Tab
+PlayerTab:AddSlider({
+    Name = "Jump Power",
+    Min = 0,
+    Max = 200,
+    Default = defaultJumpPower,
+    Color = Color3.fromRGB(255, 255, 255),
+    Increment = 1,
+    ValueName = "Power",
+    Callback = function(Value)
+        SetJumpPower(Value)
+    end    
+})
+
+-- Add Reset Button for Jump Power in Player Tab
+PlayerTab:AddButton({
+    Name = "Reset Jump Power",
+    Callback = function()
+        SetJumpPower(defaultJumpPower)
+    end    
+})
+
+-- Add Instant Respawn Toggle for Player Tab
+PlayerTab:AddToggle({
+    Name = "Instant Respawn",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            InstantRespawn()
+        end
+    end    
+})
+
+-- Add Teleport Textbox for Player Tab
+PlayerTab:AddTextbox({
+    Name = "Teleport Coordinates",
+    Default = "0, 0, 0",
+    TextDisappear = true,
+    Callback = function(Value)
+        local coords = string.split(Value, ",")
+        local x = tonumber(coords[1]) or 0
+        local y = tonumber(coords[2]) or 0
+        local z = tonumber(coords[3]) or 0
+        TeleportToCoordinates(x, y, z)
+    end    
+})
+
+-- Add Fling Button for Player Tab
+PlayerTab:AddButton({
+    Name = "Fling Character",
+    Callback = function()
+        FlingCharacter()
+    end    
+})
+
+-- Create the Script Tab (formerly Tab 2)
+local ScriptTab = Window:MakeTab({
+	Name = "Script",  -- Renamed Tab
+	Icon = "rbxassetid://4483345998", -- Replace with your icon ID if needed
+	PremiumOnly = false
+})
+
+-- Add Buttons to Script Tab
+ScriptTab:AddButton({
+	Name = "Arm Wrestle Script",
+	Callback = function()
+		-- Load the Arm Wrestle script when the button is clicked
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/Zora-As/Zora-s-Script/refs/heads/main/Arm%20Wrestle", true))()
+	end
+})
+
+ScriptTab:AddButton({
+	Name = "Anti-AFK Script",
+	Callback = function()
+		-- Load the Anti-AFK script when the button is clicked
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/Zora-As/Anti-AFK-Script/refs/heads/main/anti_afk_script.lua"))()
+	end
+})
+
+ScriptTab:AddButton({
+	Name = "Fisch_Spectrum",
+	Callback = function()
+		-- Load the Fisch_Spectrum script when the button is clicked
+		loadstring(game:HttpGet("https://you.whimper.xyz/spectrum"))()
+	end
+})
+
+ScriptTab:AddButton({
+	Name = "Fisch_C",
+	Callback = function()
+		-- Load the Fisch_C script when the button is clicked
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/Zora-As/Zora-s-Script/refs/heads/main/Fisch-Zora%20Hub", true))()
+	end
+})
+
+-- Add Infinite Yield Button to Script Tab
+ScriptTab:AddButton({
+	Name = "Infinite Yield",
+	Callback = function()
+		-- Load Infinite Yield script when the button is clicked
+		loadstring(game:HttpGet(('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'),true))()
+	end
+})
+
+-- Create the Settings Tab
+local SettingsTab = Window:MakeTab({
+	Name = "Settings",  -- New Tab Name
+	Icon = "rbxassetid://4483345998", -- Replace with your icon ID if needed
+	PremiumOnly = false
+})
+
+-- Add FPS Boost Button to Settings Tab
+SettingsTab:AddButton({
+	Name = "FPS Boost",
+	Callback = function()
+		-- FPS Boost script to improve FPS performance
+		local player = game.Players.LocalPlayer
+		local camera = game.Workspace.CurrentCamera
+		local playerScripts = game:GetService("Players").LocalPlayer.PlayerScripts
+
+		-- Disabling shadows and some other settings that can help boost FPS
+		game:GetService("Lighting").GlobalShadows = false
+		game:GetService("Lighting").ShadowSoftness = 0
+		camera.FieldOfView = 70 -- Set field of view to a lower value for better performance
+		player.PlayerGui:SetCore("SendNotification", {
+			Title = "FPS Boost",
+			Text = "FPS Boost activated successfully!",
+			Duration = 5
+		})
+		print("FPS Boost Activated!")
+	end
+})
+
+-- Add Clear Chat Button to Settings Tab
+SettingsTab:AddButton({
+	Name = "Clear Chat",
+	Callback = function()
+		-- Clear the in-game chat
+		local chatService = game:GetService("Chat")
+		for _, message in ipairs(chatService:GetChildren()) do
+			if message:IsA("TextLabel") then
+				message:Destroy()
+			end
+		end
+		print("Chat Cleared!")
+	end
+})
+
+-- Add Custom Keybind Button for Settings Tab
+SettingsTab:AddButton({
+	Name = "Custom Keybind",
+	Callback = function()
+		-- Change keybind or perform some action when a custom key is pressed
+		print("Custom keybind feature is under development!")
+	end
+})
+
+-- Add Music Player Button to Settings Tab
+SettingsTab:AddButton({
+	Name = "Music Player",
+	Callback = function()
+		-- A simple music player button to play music in the game
+		print("Music Player is under development!")
+	end
+})
+
+-- Add Time of Day Adjuster to Settings Tab
+SettingsTab:AddSlider({
+	Name = "Time of Day",
+	Min = 0,
+	Max = 24,
+	Default = 12,
+	Color = Color3.fromRGB(255, 255, 255),
+	Increment = 1,
+	ValueName = "Hour",
+	Callback = function(Value)
+		-- Adjust the time of day in the game world
+		game:GetService("Lighting").ClockTime = Value
+		print("Time set to " .. Value .. " hours.")
+	end    
+})
+
+-- Add Toggle for Night Mode to Settings Tab
+SettingsTab:AddToggle({
+	Name = "Night Mode",
+	Default = false,
+	Callback = function(Value)
+		if Value then
+			-- Activate Night Mode (darker environment)
+			game:GetService("Lighting").Brightness = 0.1
+			print("Night Mode Activated!")
+		else
+			-- Deactivate Night Mode (normal brightness)
+			game:GetService("Lighting").Brightness = 2
+			print("Night Mode Deactivated!")
+		end
+	end
+})
+
+-- Finalize the GUI
+OrionLib:Init()

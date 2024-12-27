@@ -227,6 +227,16 @@ ScriptTab:AddButton({
 	end
 })
 
+-- Add Fisch - BlackHub Button to Script Tab
+ScriptTab:AddButton({
+    Name = "Fisch - BlackHub",
+    Callback = function()
+        -- Load Fisch - BlackHub script when the button is clicked
+        getgenv().key = "Nexsie"
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Skibidiking123/Fisch1/refs/heads/main/FischMain"))()
+    end
+})
+
 -- Create the Settings Tab
 local SettingsTab = Window:MakeTab({
 	Name = "Settings",  -- New Tab Name

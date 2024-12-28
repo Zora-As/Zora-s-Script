@@ -66,6 +66,21 @@ local function TeleportToCoordinates(x, y, z)
     end
 end
 
+-- Teleport to Player (for Player Tab)
+local function TeleportToPlayer(playerName)
+    local player = game.Players:FindFirstChild(playerName)
+    if player and player.Character then
+        local targetRootPart = player.Character:FindFirstChild("HumanoidRootPart")
+        local localCharacter = game.Players.LocalPlayer.Character
+        if targetRootPart and localCharacter then
+            local localRootPart = localCharacter:WaitForChild("HumanoidRootPart")
+            localRootPart.CFrame = targetRootPart.CFrame
+        end
+    else
+        print("Player not found or player has no character.")
+    end
+end
+
 -- Instant Respawn Toggle (for Player Tab)
 local function InstantRespawn()
     game.Players.LocalPlayer.CharacterAdded:Connect(function(character)
@@ -167,6 +182,16 @@ PlayerTab:AddTextbox({
         local y = tonumber(coords[2]) or 0
         local z = tonumber(coords[3]) or 0
         TeleportToCoordinates(x, y, z)
+    end    
+})
+
+-- Add Teleport to Player Textbox for Player Tab
+PlayerTab:AddTextbox({
+    Name = "Teleport to Player",
+    Default = "PlayerName",
+    TextDisappear = true,
+    Callback = function(Value)
+        TeleportToPlayer(Value)
     end    
 })
 
